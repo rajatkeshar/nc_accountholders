@@ -20,28 +20,34 @@ const AcHolders = mongoose.model("AcHolders");
 var url = 'https://ethplorer.io/service/service.php?refresh=holders&data=0x809826cceAb68c387726af962713b64Cb5Cb3CCA&page=tab%3Dtab-holders%26pageSize%3D100%26holders%3D';
 
 async function manipulateData(counter) {
-	var info = await httpCall.call("GET", url + counter);
-	if(info && info.holders && Array.isArray(info.holders)) {
-		//console.log(info.holders[0].balance/1000000000000000000);
-		info.holders.forEach(function(obj, index) {
-			var details = {
-				address:obj.address,
-				balance: obj.balance/1000000000000000000,
-				share: obj.share
-			};
-			AcHolders.findOneAndUpdate(
-					{ address: details.address }, // find a document with that filter
-					details, // document to insert when nothing was found
-					{ upsert: true, new: true, runValidators: true }, // options
-					function (err, doc) { // callback
-							if (err) {
-									console.log("err: ", err);
-							} else {
-									console.log("doc inserted successfully: ", doc);
-							}
-					}
-			);
-		});
+	try {
+		var info = await httpCall.call("GET", url + counter);
+		if(info && info.holders && Array.isArray(info.holders)) {
+			//console.log(info.holders[0].balance/1000000000000000000);
+			info.holders.forEach(function(obj, index) {
+				var details = {
+					address:obj.address,
+					balance: obj.balance/1000000000000000000,
+					share: obj.share
+				};
+				AcHolders.findOneAndUpdate(
+						{ address: details.address }, // find a document with that filter
+						details, // document to insert when nothing was found
+						{ upsert: true, new: true, runValidators: true }, // options
+						function (err, doc) { // callback
+								if (err) {
+										console.log("err: ", err);
+								} else {
+										console.log("doc inserted successfully: ", doc);
+								}
+						}
+				);
+			});
+		} else {
+			console.log("info: ", info);
+		}
+	} catch (e) {
+			console.log("Caught Exeptions: ", e);
 	}
 }
 
@@ -61,7 +67,7 @@ async function start(counter) {
 	}
 }
 
-const job = new CronJob('00 30 11 * * 1-7', function() {
+const job = new CronJob('00 24 16 * * 0-6', function() {
 	console.log('Started Cron At:', new Date());
 	start(0);
 });
