@@ -52,22 +52,23 @@ async function manipulateData(counter) {
 }
 
 async function start(counter) {
+	console.log("Current counter value: ", counter);
 	if(counter < constants.TOTAL_PAGE){
     await (function() {
 			setTimeout(async function(){
 				await manipulateData(++counter);
 	      await start(counter);
-	    }, 4000);
+	    }, 5000);
 		})();
   } else {
 		setTimeout(function() {
 			console.log("Data Extraction Is Done!!, Calling CSV Loader...");
 			appLoader.csvLoader();
-		}, 2000);
+		}, 3000);
 	}
 }
 
-const job = new CronJob('00 24 16 * * 0-6', function() {
+const job = new CronJob('00 00 00 * * 0-6', function() {
 	console.log('Started Cron At:', new Date());
 	start(0);
 });
