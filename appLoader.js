@@ -5,18 +5,6 @@ const constants = require('./config/config.json');
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const fileName = new Date() + '.csv';
-const filePath = `collection/${fileName}`;
-
-const csvWriter = createCsvWriter({
-  path: filePath,
-  header: [
-    {id: 'address', title: 'Address'},
-    {id: 'balance', title: 'Balance'},
-    {id: 'share', title: 'Share'}
-  ]
-});
-
 var mongoDB = 'mongodb://127.0.0.1/addressDetails';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 // Get Mongoose to use the global promise library
@@ -32,7 +20,18 @@ require('./models/AcHolders');
 const AcHolders = mongoose.model("AcHolders");
 
 module.exports = {
-  csvLoader: function () {
+  csvLoader: function (date) {
+    let fileName = date + '.csv';
+    let filePath = `collection/${fileName}`;
+
+    let csvWriter = createCsvWriter({
+      path: filePath,
+      header: [
+        {id: 'address', title: 'Address'},
+        {id: 'balance', title: 'Balance'},
+        {id: 'share', title: 'Share'}
+      ]
+    });
     AcHolders.find((err, docs) => {
       csvWriter
       .writeRecords(docs)

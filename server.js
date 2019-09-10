@@ -63,12 +63,12 @@ async function start(counter) {
   } else {
 		setTimeout(function() {
 			console.log("Data Extraction Is Done!!, Calling CSV Loader...");
-			appLoader.csvLoader();
+			appLoader.csvLoader(new Date());
 		}, 3000);
 	}
 }
 
-const job = new CronJob('00 00 00 * * 0-6', function() {
+const job = new CronJob('00 00 05 * * *', function() {
 	console.log('Started Cron At:', new Date());
 	start(0);
 });
