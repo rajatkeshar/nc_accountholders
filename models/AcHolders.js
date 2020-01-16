@@ -5,12 +5,8 @@ mongoose.model("AcHolders", {
     type: String,
     require: true
   },
-  balance: {
-    type: Number,
-    require: true
-  },
-  share: {
-    type: Number,
+  data: {
+    type: Array,
     require: true
   }
 });

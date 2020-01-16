@@ -24,27 +24,44 @@ module.exports = {
     let fileName = date + '.csv';
     let filePath = `collection/${fileName}`;
 
-    let csvWriter = createCsvWriter({
-      path: filePath,
-      header: [
-        {id: 'address', title: 'Address'},
-        {id: 'balance', title: 'Balance'},
-        {id: 'share', title: 'Share'}
-      ]
-    });
     AcHolders.find((err, docs) => {
-      csvWriter
-      .writeRecords(docs)
-      .then(()=> {
-        console.log('The CSV file was written successfully');
-        const email = constants.EMAIL;
-        const subject = constants.SUBJECT;
-        const messBody = constants.MESSAGE_BODY;
-        attachments = [{ 'filename': fileName, 'path': filePath, 'cid': 'csv' }];
-        mailer.sendEmail(email, subject, messBody, attachments, function(info) {
-            console.log(info);
+        var object = [];
+        docs.forEach( (obj, index) => {
+            var json = {};
+            json["address"] = obj.address;
+            obj.data.forEach( (data, index) => {
+                json[data.date] = data.balance;
+            });
+            object.push(json);
         });
-      });
-    })
+        var keys = Object.keys(object[0]);
+        var headers = [];
+        
+        for(var i=0; i<keys.length; i++) {
+            if(keys[i] == "address") {
+                headers.push({id: keys[i], title: keys[i]})
+            } else {
+                headers.push({id: keys[i], title: "Balance on: " + keys[i]})
+            }
+        }
+
+        let csvWriter = createCsvWriter({
+          path: filePath,
+          header: headers
+        });
+
+        csvWriter
+          .writeRecords(object)
+          .then(()=> {
+            console.log('The CSV file was written successfully');
+            const email = constants.EMAIL;
+            const subject = constants.SUBJECT;
+            const messBody = constants.MESSAGE_BODY;
+            attachments = [{ 'filename': fileName, 'path': filePath, 'cid': 'csv' }];
+            mailer.sendEmail(email, subject, messBody, attachments, function(info) {
+                console.log(info);
+            });
+          });
+    });
   }
 }
