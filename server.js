@@ -21,6 +21,7 @@ const AcHolders = mongoose.model("AcHolders");
 var url = 'https://ethplorer.io/service/service.php?refresh=holders&data=0x809826cceAb68c387726af962713b64Cb5Cb3CCA&page=tab%3Dtab-holders%26pageSize%3D100%26holders%3D';
 
 async function manipulateData(counter, date) {
+	console.log(date);
     try {
         var info = await httpCall.call("GET", url + counter);
         if(info && info.holders && Array.isArray(info.holders)) {
@@ -60,7 +61,7 @@ async function start(counter, date) {
 	if(counter < constants.TOTAL_PAGE){
     	await (function() {
 			setTimeout(async function(){
-				await manipulateData(++counter);
+				await manipulateData(++counter, date);
 	      		await start(counter);
 	    	}, 5000);
 		})();
@@ -74,7 +75,7 @@ async function start(counter, date) {
 
 const job = new CronJob('00 00 05 * * *', function() {
 	console.log('Started Cron At:', new Date());
-	date = moment().format("MMM Do YYYY, h:mm:ss a");
+	date = moment().format("MMM Do YYYY");
 	start(0, date);
 });
 job.start();
