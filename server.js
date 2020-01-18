@@ -62,7 +62,7 @@ async function start(counter, date) {
     	await (function() {
 			setTimeout(async function(){
 				await manipulateData(++counter, date);
-	      		await start(counter);
+	      		await start(counter, date);
 	    	}, 5000);
 		})();
   	} else {
